@@ -1,5 +1,5 @@
 """
-Shared Category Model
+Category Model
 
 Database model for categories shared across club applications.
 """
@@ -9,9 +9,9 @@ from sqlalchemy.sql import func
 from ..database.base import Base
 
 
-class SharedCategory(Base):
+class Category(Base):
     """
-    Shared category model.
+    Category model.
     
     Categories can be:
     1. Predefined (user_id=NULL, is_predefined=True) - Available to all users
@@ -19,7 +19,7 @@ class SharedCategory(Base):
     
     Categories can be scoped to specific apps or available to all apps.
     """
-    __tablename__ = "shared_categories"
+    __tablename__ = "categories"
     
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String, nullable=False)
@@ -28,11 +28,11 @@ class SharedCategory(Base):
     app_scope = Column(String, nullable=False)  # coin/care/career/campfire/all
     is_predefined = Column(Boolean, default=False, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=True, index=True)
-    parent_id = Column(Integer, ForeignKey('shared_categories.id'), nullable=True)
+    parent_id = Column(Integer, ForeignKey('categories.id'), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     def __repr__(self):
-        return f"<SharedCategory(id={self.id}, name={self.name}, type={self.type}, app_scope={self.app_scope})>"
+        return f"<Category(id={self.id}, name={self.name}, type={self.type}, app_scope={self.app_scope})>"
     
     def to_dict(self):
         """Convert to dictionary."""
@@ -77,3 +77,7 @@ class AppSettings(Base):
             "value": self.value,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
+
+
+# Backwards-compatible alias: `common_club.models` imports `SharedCategory`.
+SharedCategory = Category
